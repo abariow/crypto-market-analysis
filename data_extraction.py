@@ -1,16 +1,20 @@
+import os
+import time
+import datetime
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-import time
-import datetime
+from selenium.webdriver.support import expected_conditions as EC
 
 
+# CHROME_DRIVER_PATH = '/usr/lib/chromium-browser/chromedriver'
 COINMARKETCAP_URL = 'https://coinmarketcap.com/'
 COIN_HISTORICAL_URL = COINMARKETCAP_URL + 'historical/'
 DATE = datetime.date(2023, 8, 25)
-DATE.strftime('%Y%m%d')
+# DATE.strftime('%Y%m%d')
 
 class Coin:
     def __init__(self, name, symbol, main_link, historical_link=None):
@@ -18,14 +22,41 @@ class Coin:
         self.symbol = symbol
         self.main_link = main_link
         self.historical_link = historical_link
-        
+
+class CoinHistory:
+    pass
 
 class CoinScraper:
-    def __init__(self):
+    def __init__(self, data_path=None):
         self.coins = None
-        self.driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
+
+        project_path = os.path.abspath(os.path.dirname(__file__))
+        data_relative_path = 'data'
+
+        if not data_path:
+            self.data_path = os.path.join(project_path, data_relative_path)
+        else:
+            self.data_path = data_path
+        
+        if not os.path.exists(self.data_path):
+            os.makedirs(self.data_path)
+
+        chrome_options = webdriver.ChromeOptions()
+        prefs = {
+            "download.default_directory": self.data_path,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": False,
+        }
+        chrome_options.add_experimental_option("prefs", prefs)
+
+        # self.driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=chrome_options)
+        self.driver = webdriver.Chrome(options=chrome_options)
         self.wait = WebDriverWait(self.driver, 10)
-           
+        
+    def __del__(self):
+        self.driver.quit()
+            
     def get_coins(self):
         self.driver.get(COIN_HISTORICAL_URL + DATE.strftime('%Y%m%d'))
         
@@ -66,8 +97,18 @@ class CoinScraper:
         return self.coins
     
     
-    def get_historical_data(self, coin):
-        pass
+    def download_historical_data(self, coin):
+        self.driver.get(coin.historical_link)
+        date_button = self.driver.find_elements_by_tag_name('button')[3]
+        date_button.click()
+        self.wait.until(EC.visibility_of_element_located((By.ID, 'tippy-1')))
+        tippy = self.driver.find_element_by_id('tippy-1')
+        tippy.find_elements_by_tag_name('li')[-1].click()
+        tippy.find_elements_by_tag_name('button')[1].click()
+        download_button = self.driver.find_elements_by_tag_name('button')[4]
+        time.sleep(0.5)
+        download_button.click()
+
     
     def get_coins_table(self):
         if not self.coins:
@@ -77,8 +118,20 @@ class CoinScraper:
             coins_table.loc[i] = [i+1, coin.name, coin.symbol, coin.main_link, coin.historical_link]
         return coins_table
     
-    def cions_to_csv(self, filename):
+    def cions_to_csv(self, file_name):
         if not self.coins:
             self.get_coins()
         coins_table = self.get_coins_table()
-        coins_table.to_csv(filename, index=False)
+        path = os.path.join(self.data_path, file_name)
+        coins_table.to_csv(path, index=False)
+    
+
+def main():
+    cs = CoinScraper()
+    cs.get_coins()
+    cs.cions_to_csv('Coins.csv')
+    for coin in cs.coins:
+        cs.download_historical_data(coin)
+        
+if __name__ == '__main__':
+    main()
