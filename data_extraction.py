@@ -17,11 +17,13 @@ DATE = datetime.date(2023, 8, 25)
 # DATE.strftime('%Y%m%d')
 
 class Coin:
-    def __init__(self, name, symbol, main_link, historical_link=None):
+    def __init__(self, name, symbol, main_link, historical_link=None,github_link=None, tags=None):
         self.name = name
         self.symbol = symbol
         self.main_link = main_link
         self.historical_link = historical_link
+        self.github_link = github_link
+        self.tags = tags
 
 class CoinHistory:
     pass
@@ -53,6 +55,8 @@ class CoinScraper:
         # self.driver = webdriver.Chrome(CHROME_DRIVER_PATH, options=chrome_options)
         self.driver = webdriver.Chrome(options=chrome_options)
         self.wait = WebDriverWait(self.driver, 10)
+        self.driver1 = webdriver.Chrome()
+        self.wait = WebDriverWait(self.driver1, 10)
         
     def __del__(self):
         self.driver.quit()
@@ -90,12 +94,40 @@ class CoinScraper:
             dropdown_cell = popover_cell.find_element_by_class_name('cmc-popover__dropdown')
             historical_link = dropdown_cell.find_element_by_link_text('View Historical Data').get_attribute('href')
             popover_cell.click()
+            github_link = self.extract_github_link(main_link)
+            tags =self.extract_tags(self.driver1,main_link)
             # historical_link = main_link + 'historical-data/'
-            self.coins.append(Coin(name, symbol, main_link, historical_link))
+            self.coins.append(Coin(name, symbol, main_link, historical_link,github_link,tags))
             
         return self.coins
-    
-    
+        
+    def extract_github_link(self,main_link):
+        res = requests.get(main_link)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+        github_link = soup.find(lambda tag: tag.name == "a" and "GitHub" in tag.text)
+        if github_link is not None:
+            return github_link['href']
+        else:
+            return 'None'
+            
+    def extract_tags(self,driver1,main_link):
+        self.driver1.get(main_link)
+        try:
+            show_all=driver1.find_element(By.XPATH,'/html/body/div[1]/div[2]/div[1]/div[2]/div/div/div[2]/div[3]/section[2]/div/div[7]/div[2]/div/span[4]')
+            show_all.click()
+            tags_name=driver1.find_elements(By.CSS_SELECTOR,'.ddQhJW a')
+            return [tag_name.text for tag_name in tags_name]   
+        except:
+            try:
+                show_all=driver1.find_element(By.XPATH,'/html/body/div[1]/div[2]/div[1]/div[2]/div/div/div[2]/div[4]/section[2]/div/div[7]/div[2]/div/span[4]')
+                show_all.click()
+                tags_name=driver1.find_elements(By.CSS_SELECTOR,'.ddQhJW a')
+                return [tag_name.text for tag_name in tags_name]
+            except:
+                tags_name=driver1.find_elements(By.CSS_SELECTOR,'div.itVAyl:nth-child(7) > div:nth-child(2) a')
+                return [tag_name.text for tag_name in tags_name]
+                
     def download_historical_data(self, coin):
         self.driver.get(coin.historical_link)
         date_button = self.driver.find_elements_by_tag_name('button')[3]
@@ -112,9 +144,9 @@ class CoinScraper:
     def get_coins_table(self):
         if not self.coins:
             self.get_coins()
-        coins_table = pd.DataFrame(columns=['Rank', 'Name', 'Symbol', 'MainLink', 'HistoricalLink'])
+        coins_table = pd.DataFrame(columns=['Rank', 'Name', 'Symbol', 'MainLink', 'HistoricalLink','github_link','tags'])
         for i, coin in enumerate(self.coins):
-            coins_table.loc[i] = [i+1, coin.name, coin.symbol, coin.main_link, coin.historical_link]
+            coins_table.loc[i] = [i+1, coin.name, coin.symbol, coin.main_link, coin.historical_link,coin.github_link,coin.tags]
         return coins_table
     
     def cions_to_csv(self, file_name):
