@@ -77,21 +77,20 @@ class CoinScraper:
         self.coins = []
         print(len(rows))
         for i, row in enumerate(rows):
-            # if i % 10 == 0:
-            #     y_position = row.location['y'] 
-            #     # Scroll to the specific Y-coordinate position
-            #     self.driver.execute_script("window.scrollTo(0, {});".format(y_position - 80))  
+            if i % 10 == 0:
+                y_position = row.location['y'] 
+                # Scroll to the specific Y-coordinate position
+                self.driver.execute_script("window.scrollTo(0, {});".format(y_position - 100))  
             tds = row.find_elements_by_tag_name('td')
             name = tds[columns.index('Name')].text
             symbol = tds[columns.index('Symbol')].text    
             main_link = tds[columns.index('Name')].find_element_by_tag_name('a').get_attribute('href')
-            # popover_cell = row.find_element(By.CSS_SELECTOR, ".sc-63cc44da-0.kHpXFp")
-            # # y_position = row.location['y'] 
-            # popover_cell.click()
-            # dropdown_cell = popover_cell.find_element_by_class_name('cmc-popover__dropdown')
-            # historical_link = dropdown_cell.find_element_by_link_text('View Historical Data').get_attribute('href')
-            # popover_cell.click()
-            historical_link = main_link + 'historical-data/'
+            popover_cell = row.find_element(By.CSS_SELECTOR, ".sc-63cc44da-0.kHpXFp")
+            popover_cell.click()
+            dropdown_cell = popover_cell.find_element_by_class_name('cmc-popover__dropdown')
+            historical_link = dropdown_cell.find_element_by_link_text('View Historical Data').get_attribute('href')
+            popover_cell.click()
+            # historical_link = main_link + 'historical-data/'
             self.coins.append(Coin(name, symbol, main_link, historical_link))
             
         return self.coins
