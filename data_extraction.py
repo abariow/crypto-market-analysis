@@ -79,10 +79,8 @@ class CoinScraper:
         rows = coins_table.find_elements_by_tag_name("tr")
 
         self.coins = []
-        print(len(rows))
         for i, row in enumerate(rows):
             if i % 10 == 0:
-                
                 y_position = row.location['y'] 
                 # Scroll to the specific Y-coordinate position
                 self.driver.execute_script("window.scrollTo(0, {});".format(y_position - 100))  
@@ -176,6 +174,8 @@ def main():
     cs.cions_to_csv('Coins.csv')
     for coin in cs.coins:
         cs.download_historical_data(coin)
+    time.sleep(0.5)
+
         
 if __name__ == '__main__':
     main()
