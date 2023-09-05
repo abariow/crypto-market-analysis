@@ -148,8 +148,9 @@ class CoinScraper:
         tippy.find_elements_by_tag_name('li')[-1].click()
         tippy.find_elements_by_tag_name('button')[1].click()
         download_button = self.driver.find_elements_by_tag_name('button')[4]
-        time.sleep(0.5)
+        time.sleep(1)
         download_button.click()
+        # time.sleep(0.5)
 
     
     def get_coins_table(self):
