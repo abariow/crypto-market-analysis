@@ -11,6 +11,18 @@ CREATE TABLE Cryptocurrencies(
     PRIMARY KEY (crypto_id)
 );
 
+-- Your Coins.csv file path goes here:
+
+LOAD DATA INFILE 'path_to_Coins.csv'
+INTO TABLE Cryptocurrencies
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(crypto_id, crypto_name, symbol, main_link, historical_link, github_link ,@dummy)
+SET rnk = crypto_id;
+
+
 CREATE TABLE Tags (
   tag_id INT NOT NULL AUTO_INCREMENT,
   tag_name VARCHAR(50) NOT NULL,
