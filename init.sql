@@ -1452,7 +1452,6 @@ Values
 ,('2023-12-31')
 
 
->>>>>>> main
 -------------------------------------
 
 CREATE TABLE CryptoDailyHistory (
