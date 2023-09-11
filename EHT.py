@@ -1,5 +1,0 @@
-#### Estimation ####
-
-
-
-#### Inferential Statistics #####
