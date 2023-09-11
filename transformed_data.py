@@ -12,6 +12,3 @@ class TransformedData:
     crypto_historical_prices_df = pd.read_csv('transformed_data/crypto_historical_prices.csv')
 
 
-print("safsd")
-
-
