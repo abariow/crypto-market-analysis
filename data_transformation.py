@@ -80,7 +80,7 @@ class CryptoDataTransformer:
             'crypto_price',  
         ])
                                                                             
-    def read_raw_data(self, data_path):
+    def read_raw_data(self, data_path=None):
         
         self.raw_data['CryptosTable'] = pd.read_csv(os.path.join(self.raw_data_path, 'Coins.csv'))
         
@@ -94,20 +94,22 @@ class CryptoDataTransformer:
             self.raw_data['CryptosHistoricalTables'].append(crypto_historical_table)
             
     
-    def write_transformed_data(self, data_path):
+    def write_transformed_data(self, data_path=None):
+        if not os.path.exists(self.transformed_data_path):
+            os.makedirs(self.transformed_data_path)
         for table_name in self.transformed_data:
             path = os.path.join(self.transformed_data_path, "{}.csv".format(table_name))
             self.transformed_data[table_name].to_csv(path, index=False)
     
     def transform(self):
-        self.transform_to_cryptocurrencies()
-        self.transform_to_tags()
-        self.transform_to_crypto_tag()
-        self.transform_to_dates()
-        self.transfrom_to_crypto_price_types()
-        self.transform_to_crypto_daily_history()
-        self.transform_to_crypto_price_times()
-        self.transform_to_crypto_historical_prices()
+        self.__transfrom_to_cryptocurrencies()
+        self.__transform_to_tags()
+        self.__transform_to_crypto_tag()
+        self.__transform_to_dates()
+        self.__transfrom_to_crypto_price_types()
+        self.__transform_to_crypto_daily_history()
+        self.__transform_to_crypto_price_times()
+        self.__transform_to_crypto_historical_prices()
         
     def get_transformed_data(self):
         return self.transformed_data
@@ -217,7 +219,8 @@ class CryptoDataTransformer:
         self.transformed_data['Dates'] = self.dates
 
     def __transfrom_to_crypto_price_types(self):
-        pass
+        self.transformed_data['CryptoPriceTypes'] = self.crypto_price_types
+        
     
     def __transform_to_crypto_daily_history(self):
         crypot_daily_id = 0
@@ -237,7 +240,7 @@ class CryptoDataTransformer:
 
         self.crypto_daily_history = pd.DataFrame(
             crypto_daily_history_data, 
-            columns=self.crypto_daily_history_df.columns,
+            columns=self.crypto_daily_history.columns,
         )
         self.transformed_data['CryptoDailyHistory'] = self.crypto_daily_history
         
@@ -249,7 +252,7 @@ class CryptoDataTransformer:
         for crypto_index, _ in self.raw_data['CryptosTable'].iterrows():
             for _, history_row in self.raw_data['CryptosHistoricalTables'][crypto_index].iterrows():
                 crypot_daily_id += 1
-                for price_types_index, price_types_row in self.raw_data['CryptoPriceTypes'].iterrows():
+                for price_types_index, price_types_row in self.transformed_data['CryptoPriceTypes'].iterrows():
                     crypto_price_type_id = price_types_index + 1
                     crypto_price_time_id += 1
                     price_type = price_types_row['crypto_price_type_name']
@@ -275,7 +278,7 @@ class CryptoDataTransformer:
         crypto_historical_prices_data = []
         for crypto_index, _ in self.raw_data['CryptosTable'].iterrows():
             for _, history_row in self.raw_data['CryptosHistoricalTables'][crypto_index].iterrows():
-                for _, price_types_row in self.raw_data['CryptoPriceTypes'].iterrows():
+                for _, price_types_row in self.transformed_data['CryptoPriceTypes'].iterrows():
                     crypto_price_time_id += 1
                     price_type = price_types_row['crypto_price_type_name']
                     crypto_historical_prices_id += 1
@@ -292,3 +295,14 @@ class CryptoDataTransformer:
             columns=self.crypto_historical_prices.columns,
         )    
         self.transformed_data['CryptoHistoricalPrices'] = self.crypto_historical_prices      
+
+
+def main():
+    cdt = CryptoDataTransformer()
+    cdt.read_raw_data()
+    cdt.transform()
+    cdt.write_transformed_data()
+
+        
+if __name__ == '__main__':
+    main()
