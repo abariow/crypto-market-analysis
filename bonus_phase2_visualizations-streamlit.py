@@ -14,26 +14,107 @@ import plotly.graph_objects as go
 
 #################################################
 
-### Get Data
-df_gold = pd.read_csv('./data_phase2/Q3_Gold_data.csv')
-df_silver = pd.read_csv('./data_phase2/Q3_Silver_data.csv')
-df_copper = pd.read_csv('./data_phase2/Q3_Copper_data.csv')
-df_bitcoin = pd.read_csv('./data_phase2/Q3_Bitcoin_data.csv')
-df_bnb = pd.read_csv('./data_phase2/Q3_Binance Coin_data.csv')
-df_etheruem = pd.read_csv('./data_phase2/Q3_Etheruem_data.csv')
-df_sp500 = pd.read_csv('./data_phase2/Q3_S&P500_data.csv')
-df_tether = pd.read_csv('./data_phase2/Q3_Tether_data.csv')
-df_xrp = pd.read_csv('./data_phase2/Q3_XRP_data.csv')
-df_xmr = pd.read_csv('./data_phase2/Q3_XMR_data.csv')
-
-
-#################################################
-
 st.set_page_config(
     page_title = 'Quera Project Phase 2',
-    page_icon = '✅',
+    page_icon = 'random',
     layout = 'centered'
 )
+
+### Set Title
+st.markdown('<div style="text-align: center; font-size: 45px; margin-bottom:30px">Quera Project - Phase 2</div>', unsafe_allow_html=True)
+
+############################################################  Q1 Start ############################################################
+st.markdown("<hr/>", unsafe_allow_html=True)
+st.markdown('<div style="text-align: center; font-size: 25px; margin-bottom:30px">Question 1</div>', unsafe_allow_html=True)
+
+Q1_data = pd.read_csv('./data_phase2/Q1_data.csv')
+Q1_data.drop(columns=['Unnamed: 0'], inplace=True)
+st.write(f"Here we will take a look at a sample of our data :")
+st.dataframe(Q1_data.head())
+st.write(f"And also its shape :")
+st.write(Q1_data.shape)
+st.write(f"So, how many unique coins do we have in this dataset?")
+st.code(list(Q1_data['name'].value_counts().index))
+
+st.write(f"We can also notice that we have a time series dataset.")
+st.write(f"Also, what is our dataset's date range? Let's find out.")
+Q1_data['time_stamp'] = pd.to_datetime(Q1_data['time_stamp'])
+st.markdown(f"Minimum date is : <code>{Q1_data['time_stamp'].min().date()}</code>", unsafe_allow_html=True)
+st.markdown(f"Maximum date is : <code>{Q1_data['time_stamp'].max().date()}</code>", unsafe_allow_html=True)
+
+st.markdown('<div style="text-align: center; font-size: 25px">******</div>', unsafe_allow_html=True)
+st.write(f"Let's see which coin has had the largest sum of Volume over this period.")
+
+Q1_data_agg_vol = Q1_data.groupby(['name']).agg({'volume': 'sum'})
+Q1_data_agg_vol = Q1_data_agg_vol.sort_values(by='volume', ascending=False)
+
+st.dataframe(Q1_data_agg_vol)
+st.markdown(f"As seen above, <code>{Q1_data_agg_vol.index[0]}</code> stands first.", unsafe_allow_html=True)
+
+st.markdown('<div style="text-align: center; font-size: 25px">******</div>', unsafe_allow_html=True)
+
+st.write(f"As our last peek of this dataset, let's see which coin has had the largest sum of Market Cap over this period.")
+Q1_data_agg_mkcp = Q1_data.groupby(['name']).agg({'market_cap': 'sum'})
+Q1_data_agg_mkcp = Q1_data_agg_mkcp.sort_values(by='market_cap', ascending=False)
+st.dataframe(Q1_data_agg_mkcp)
+st.markdown(f"Obviously, <code>{Q1_data_agg_mkcp.index[0]}</code> wins the prize.", unsafe_allow_html=True)
+market_cap_quote = """
+> The total market value of a cryptocurrency's circulating supply.
+"""
+st.markdown(f"And this was expected. Since the definition of Market Capitalization is : {market_cap_quote}")
+
+
+############################################################  Q1 End ############################################################
+
+
+
+
+
+############################################################  Q2 Start ############################################################
+st.markdown("<hr/>", unsafe_allow_html=True)
+st.markdown('<div style="text-align: center; font-size: 25px; margin-bottom:30px">Question 2</div>', unsafe_allow_html=True)
+
+Q2_data = pd.read_csv('./data_phase2/Q2_data.csv')
+st.write(f"Let's first take a look at a sample of our data :")
+st.dataframe(Q2_data.head())
+st.write(f"And also its shape :")
+st.write(Q2_data.shape)
+st.write(f"We can see that we have 20 different coins along with 5 features.")
+st.write(f"Now, let's perform some analysis on these features using plots.")
+st.markdown('<div style="text-align: center; font-size: 25px">******</div>', unsafe_allow_html=True)
+
+
+### Plot Volume and MarketCap 
+st.write(f"Distriution of Volume and MarketCap")
+selected_col = st.selectbox('Select a feature :', ['Volume', 'MarketCap'])
+st.bar_chart(data=Q2_data, x='Symbol', y=selected_col, color='Symbol')
+
+st.markdown('<div style="text-align: center; font-size: 25px">******</div>', unsafe_allow_html=True)
+
+### Plot PoW and Network 
+st.write(f"Distriution of ProofType and Network")
+selected_col = st.selectbox('Select a feature :', ['ProofType', 'Network'])
+value_counts = Q2_data[selected_col].value_counts()
+st.bar_chart(value_counts)
+
+st.markdown('<div style="text-align: center; font-size: 25px">******</div>', unsafe_allow_html=True)    
+
+############################################################  Q2 End ############################################################
+
+############################################################  Q3 Start ############################################################
+
+### Get Data
+# df_gold = pd.read_csv('./data_phase2/Q3_Gold_data.csv')
+# df_silver = pd.read_csv('./data_phase2/Q3_Silver_data.csv')
+# df_copper = pd.read_csv('./data_phase2/Q3_Copper_data.csv')
+# df_bitcoin = pd.read_csv('./data_phase2/Q3_Bitcoin_data.csv')
+# df_bnb = pd.read_csv('./data_phase2/Q3_Binance Coin_data.csv')
+# df_etheruem = pd.read_csv('./data_phase2/Q3_Etheruem_data.csv')
+# df_sp500 = pd.read_csv('./data_phase2/Q3_S&P500_data.csv')
+# df_tether = pd.read_csv('./data_phase2/Q3_Tether_data.csv')
+# df_xrp = pd.read_csv('./data_phase2/Q3_XRP_data.csv')
+# df_xmr = pd.read_csv('./data_phase2/Q3_XMR_data.csv')
+
 
 #################################################
 
@@ -51,11 +132,11 @@ crypto_data = {
     'XMR-Monero': pd.read_csv('./data_phase2/Q3_XMR_data.csv'),
 }
 
-### Set Title
-st.title("Commodity Analysis")
+st.markdown("<hr/>", unsafe_allow_html=True)
 
 ### Set sub-title
-st.write("### Candlestick Chart")
+st.markdown('<div style="text-align: center; font-size: 25px; margin-bottom:30px">Question 3</div>', unsafe_allow_html=True)
+st.write("##### Candlestick Chart")
 
 ### Create a dropdown to select the cryptocurrency
 selected_coin = st.selectbox("Select a commodity", list(crypto_data.keys()))
@@ -266,4 +347,5 @@ if show_plot_option == 'Show BB Plot':
 
 st.markdown("<hr/>", unsafe_allow_html=True)
 
-#################################################
+############################################################  Q3 End ############################################################
+
