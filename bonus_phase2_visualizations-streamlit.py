@@ -172,10 +172,13 @@ plot_height = 1200
 # fig.show()
 
 st.write(f"### Bollinger Band Plot  + EMA/SMA Indicators")
-st.write(f"###### This section is related to Question 3 (XMR-Monero Close Price Estimation)")
-st.write(f"###### Note: Plot is Interactive.")
+st.markdown(f"")
 
 show_plot_option = st.selectbox("Show Or Hide BB Plot", ["Hide BB Plot", "Show BB Plot"])
+
+st.markdown(f"")
+st.write(f"###### Note: The Plot is Interactive.")
+st.write(f"###### Note: This section is related to Question 3 (XMR-Monero Close Price Estimation)")
 
 # if st.button("Show Bollinger Band Plot"):    
 #     show_plot = not show_plot
@@ -255,6 +258,11 @@ if show_plot_option == 'Show BB Plot':
     # Display the plot in a separate window
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
     fig.update_layout(width=plot_width, height=plot_height)
+    st.markdown(f"- Coin Data is derived from Yahoo API using yfinance module.")
+    st.markdown(f"- Sell oppurtunities have been marked with Red which indicates there will probably be a decrease in price.")
+    st.markdown(f"- Buy oppurtunities have been marked with Green which indicates there will probably be an increase in price.")
+    st.markdown(f"- 'Close' indicates the Close Price of XMR-Monero Coin.")
+
 
 st.markdown("<hr/>", unsafe_allow_html=True)
 
