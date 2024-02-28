@@ -1,6 +1,8 @@
 # Cryptocurrency Market Analysis
 
-Extracted coin data from CoinMarketCap, organizing it into a
-relational database for efficient analysis; Analyzed data and Conducted hypothesis tests to
-derive statistical insights; Tried to implement some classical ML models to predict coin price
-direction changes.
+Extracted coin data from CoinMarketCap.com
+Organized the extracted data into a relational database for efficient data management and analysis
+○ Applied various analytical techniques to analyze the extracted coin data
+○ Conducted hypothesis tests on the data to derive statistical insights
+○ Implemented classical ML models to predict coin price direction changes
+○ Worked on data preprocessing and feature engineering to enhance the performance of the ML models
